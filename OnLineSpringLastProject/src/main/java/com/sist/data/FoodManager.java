@@ -136,21 +136,24 @@ public class FoodManager {
 	
 	
 	// https://www.mangoplate.com
-	// 맛집 상세보기 가져오기 (디비로부터) ================================================================================================
+	// 맛집 상세보기 가져오기 (디비로부터) ==================================================================================================================================
 	public FoodVO foodDetailData(){
 		FoodVO vo = new FoodVO();
 		FoodDAO dao = new FoodDAO();
 		
 		try {
 			List<FoodCategoryVO> list = dao.foodCategoryListData();		// 망고플레이트의 카테고리 목록이 실시간 바뀌기 때문에, 카테고리를 디비에서 가져옴 
+			
+			// 1차 반복 -------------------------------------------------------------------------------------------------------------------
 			for(FoodCategoryVO fvo : list){
 				
 				String url = "https://www.mangoplate.com" + fvo.getLink();
 				int cateno = fvo.getNo();
 				Document doc = Jsoup.connect(url).get();
-				Elements link = doc.select("figure.restaurant-item a");							
+				Elements link = doc.select("figure.restaurant-item span.title a");							
 				System.out.println("카테고리번호 : " + cateno);
 				
+				// 2차 반복 -----------------------------------------------------------------------------
 				for(int i = 0; i < link.size(); i++){
 					
 					System.out.println("사이트 : " + link.get(i).attr("href"));
@@ -158,9 +161,11 @@ public class FoodManager {
 					
 					String url2 = "https://www.mangoplate.com" + link.get(i).attr("href");		// 상세페이지 링크
 					Document doc2 = Jsoup.connect(url2).get();
-					FoodVO vo2 = new FoodVO();
 					
-					String strPoster = "";														// 포스터 없을 때 예외처리
+			FoodVO vo2 = new FoodVO();
+			vo2.setCateno(cateno);
+					
+					/*String strPoster = "";														// 포스터 없을 때 예외처리
 					try {
 						Elements poster = doc2.select("img.center-croping");
 						
@@ -171,15 +176,49 @@ public class FoodManager {
 						strPoster = strPoster.substring(0, strPoster.lastIndexOf(","));
 					} catch (Exception e) {
 						strPoster = "no";
-					}
+						System.out.println(e.getMessage());
+					}*/
+					
+					String strPoster="";
+                 try
+                 {
+                    Elements poster=doc2.select("img.center-croping");
+                    
+                    for(int j=0;j<poster.size();j++)
+                    {
+                       String s=poster.get(j).attr("src");
+                       strPoster+=s+"^";
+                    }
+                    strPoster=strPoster.substring(0,strPoster.lastIndexOf("^"));
+                 }catch(Exception ex){
+                    strPoster="no";
+                 }
+                 vo2.setPoster(strPoster);
+					
+					
+			vo2.setPoster(strPoster);
 					
 					
 					Element title = doc2.selectFirst("span.title h1.restaurant_name");
 					Element score = doc2.selectFirst("span.title strong.rate-point span");
 					Element addr = doc2.select("tr.only-desktop td").get(0);					// 0번째 only-desktop 안의 td
-					Element tel = doc2.select("tr.only-desktop td").get(1);						// 1번째 only-desktop 안의 td
+//					Element tel = doc2.select("tr.only-desktop td").get(1);						// 1번째 only-desktop 안의 td
 					Element type = doc2.select("tr td span").get(2);
 					
+			vo2.setTitle(title.text());
+			vo2.setScore(score.text());
+			vo2.setAddr(addr.text());
+//			vo2.setTel(tel.text());
+			vo2.setType(type.text());
+			
+					String strTel = "";														// 가격 없을 때 예외처리
+					try {
+						Element tel = doc2.select("tr.only-desktop td").get(1);
+						strTel = tel.text();
+					} catch (Exception e) {
+						strTel = "no";
+					}
+			vo2.setTel(strTel);
 					
 					String strPrice = "";														// 가격 없을 때 예외처리
 					try {
@@ -188,6 +227,7 @@ public class FoodManager {
 					} catch (Exception e) {
 						strPrice = "no";
 					}
+			vo2.setPrice(strPrice);
 					
 					String strMenu = "";														// 메뉴 종류 없을 때 예외처리
 					try {
@@ -195,12 +235,13 @@ public class FoodManager {
 						
 						for(int j = 0; j < menu.size(); j++){
 							
-							strMenu += menu.get(j).text() + ",";
+							strMenu += menu.get(j).text() + "^";
 						}
-						strMenu = strMenu.substring(0, strMenu.lastIndexOf(","));
+						strMenu = strMenu.substring(0, strMenu.lastIndexOf("^"));
 					} catch (Exception e) {
 						strMenu = "no";
 					}
+			vo2.setMenu(strMenu);
 					
 					// <script id="reviewCountInfo" type="application/json">[{"action_value":1,"count":6},{"action_value":2,"count":14},{"action_value":3,"count":50}]</script>
 					
@@ -213,12 +254,18 @@ public class FoodManager {
 							JSONObject obj = (JSONObject)arr.get(a);
 							if(a == 2){															// JSON의 "action_value"가 2면 좋아요, 2이면 괜찮다, 그게아니면 별로
 								System.out.println("좋아요 : " + obj.get("count"));				// JSON의 "count"의 값 가져오기
+//			vo2.setGood((int) obj.get("count"));
+								vo2.setGood(Integer.parseInt(String.valueOf(obj.get("count"))));
 							}
 							else if(a == 1){
 								System.out.println("괜찮다 : " + obj.get("count"));
+//			vo2.setSoso((int)obj.get("count"));
+								vo2.setSoso(Integer.parseInt(String.valueOf(obj.get("count"))));
 							}
 							else{
 								System.out.println("별로 : " + obj.get("count"));
+//			vo2.setBad((int)obj.get("count"));
+								vo2.setBad(Integer.parseInt(String.valueOf(obj.get("count"))));
 							}
 							
 						}
@@ -229,14 +276,16 @@ public class FoodManager {
 					System.out.println("제목 : " + title.text());
 					System.out.println("주소 : " + addr.text());
 					System.out.println("평점 : " + score.text());
-					System.out.println("전화 : " + tel.text());
+					System.out.println("전화 : " + strTel);
 					System.out.println("종류 : " + type.text());
 					System.out.println("가격 : " + strPrice);
 					System.out.println("메뉴 : " + strMenu);
 					System.out.println("리뷰 : " + temp);
+					System.out.println("포스터 : " + strPoster);
+					
+					dao.foodDetailInsert(vo2);
 					
 					
-//					vo2.setCateno(cateno);
 				}
 				
 			}

@@ -1,5 +1,6 @@
 package com.sist.data;
 
+// food_detail7 테이블 =======================================================================
 public class FoodVO {
 
 	private int no;
