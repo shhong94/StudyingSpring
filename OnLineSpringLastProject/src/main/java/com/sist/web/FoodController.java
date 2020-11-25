@@ -10,6 +10,8 @@ import com.sist.naver.NaverManager;
 import com.sist.dao.*;
 import java.util.*;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("food/")
 // lox5F6f7KmqWjUI1iezM
@@ -18,6 +20,9 @@ public class FoodController {
 
 	@Autowired
 	private FoodDAO fdao;
+	
+	@Autowired
+	private ReplyDAO rdao;
 	
 	@Autowired
 	private NaverManager nm;																								// 네이버 검색 기능
@@ -64,7 +69,12 @@ public class FoodController {
 	
 	// 상세보기 =========================================================================================================
 	@RequestMapping("food_detail.do")
-	public String food_detail(int no, Model model){
+	public String food_detail(int no, Model model, String page){				// 댓글에서만 쓰는 페이지
+		
+		if(page == null){
+			page = "1";
+		}
+		int curpage = Integer.parseInt(page);
 		
 		FoodVO vo = fdao.FoodDetailData(no);
 		
@@ -89,9 +99,54 @@ public class FoodController {
 		rm.graph(no); 											// 워드클라우드를 생성하는 RManager의 메소드
 		
 		
-		model.addAttribute("list", list);
+		List<ReplyVO> rList = rdao.replyListData(no, curpage);
+		
+		
+		model.addAttribute("rList", rList);						// 댓글 리스트
+		model.addAttribute("list", list);						// 음식종류 리스트
 		model.addAttribute("vo", vo);
 		
 		return "food/detail";
+	}
+	
+	
+	
+	// 댓글 작성 =========================================================================================================
+	@RequestMapping("reply_insert.do")
+	public String reply_insert(int cno, String msg, HttpSession session){
+		
+//		String id = (String)session.getAttribute("id");
+//		String name = (String)session.getAttribute("name");
+		ReplyVO vo = new ReplyVO();
+		vo.setCno(cno);
+		vo.setMsg(msg);
+		vo.setId("테스트아이디");
+		vo.setName("테스트이름");
+		rdao.replyInsert(vo);
+		
+		
+		return "redirect:../food/food_detail.do?no=" + cno;
+	}
+	
+	
+	
+	// 댓글 삭제 =========================================================================================================
+	@RequestMapping("reply_delete.do")
+	public String reply_delete(int no, int cno){
+		
+		rdao.reply_delete(no);
+		
+		return "redirect:../food/food_detail.do?no=" + cno;
+	}
+	
+	
+	
+	// 댓글 삭제 =========================================================================================================
+	@RequestMapping("reply_update.do")
+	public String reply_update(int no, int cno, String msg){
+		
+		rdao.reply_update(no, msg);
+		
+		return "redirect:../food/food_detail.do?no=" + cno;
 	}
 }

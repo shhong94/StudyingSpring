@@ -8,6 +8,7 @@
 <title>Insert title here</title>
 <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
   google.charts.load("current", {packages:["corechart"]});
   google.charts.setOnLoadCallback(drawChart);
@@ -27,12 +28,30 @@
     var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
     chart.draw(data, options);
   }
+  
+  let u = 0;
+  $(function(){
+	  $('.up').click(function(){
+		  $('.updates').hide();
+		  let no = $(this).attr("value");
+		  if(u == 0){
+			  $('#u' + no).show();
+			  $(this).text("취소");
+			  u = 1;
+		  }
+		  else{
+			  $('#u' + no).hide();
+			  $(this).text("수정");
+			  u = 0;
+		  }
+	  });
+  });
 </script>
 </head>
 <body>
 	<div class="latest-products">
+		<div style="height: 130px;"></div>
       <div class="container">
-      	<div style="height: 130px;"></div>
       	<div class="row">
       		<table class="table">
       			<tr>
@@ -90,6 +109,52 @@
       					</td>
       				</tr>
       			</table>
+      			<hr>
+      			<table class="table">
+      				<tr>
+      					<td>
+      						<c:forEach var="rvo" items="${rList }">
+      							<table class="table striped">
+      								<tr>
+      									<td class="text-left">◑${rvo.name }(${rvo.dbday })</td>
+      									<td class="text-right">
+      										<%-- <c:if test="${sessionScope.id == rvo.id }"> --%>
+	      										<span value="${rvo.no }" class="btn btn-xs btn-success up">수정</span>
+	      										<a href="../food/reply_delete.do?no=${rvo.no }&cno=${vo.no}" class="btn btn-xs btn-info">삭제</a>
+      										<%-- </c:if> --%>
+      									</td>
+      								</tr>
+      								<tr>
+      									<td colspan="2">
+      										<pre style="white-space: pre-wrap; border: none; background-color: white;">${rvo.msg }</pre>
+      									</td>
+      								</tr>
+      								<tr class="updates" id="u${rvo.no }" style="display: none;">
+				      					<td colspan="2">
+ 				      						<form action="../food/reply_update.do" method="post">
+					      						<input type="hidden" name="cno" value="${vo.no }">
+					      						<input type="hidden" name="no" value="${rvo.no }">
+					      						<textarea rows="3" cols="60" name=msg style="float: left;">${rvo.msg }</textarea>
+					      						<input type="submit" value="댓글수정" class="btn btn-sm btn-primary" style="float: left; height: 70px; ">
+				      						</form>
+				      					</td>
+				      				</tr>
+      							</table>
+      						</c:forEach>
+      					</td>
+      				</tr>
+      			</table>
+      			<table class="table">
+      				<tr>
+      					<td>
+      						<form action="../food/reply_insert.do" method="post">
+	      						<input type="hidden" name="cno" value="${vo.no }">
+	      						<textarea rows="3" cols="63" name=msg style="float: left;"></textarea>
+	      						<input type="submit" value="댓글쓰기" class="btn btn-sm btn-primary" style="float: left; height: 70px; ">
+      						</form>
+      					</td>
+      				</tr>
+      			</table>
       		</div>
       		<div class="col-md-4">
       			<h3>관련 레시피 목록</h3>
@@ -108,7 +173,46 @@
       			<table class="table">
       				<tr>
       					<td class="text-center">
-      						<%-- <img src="../cloud${vo.no }.png"> --%>														<!-- 워드클라우드가 위치할 곳 -->
+      						<div id="map" style="width:100%; height:350px;"></div>
+      						<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=91139ae19d8dc792e5a690a54ba55ab2&libraries=services"></script>					
+								<script>
+								var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+								    mapOption = {
+								        center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+								        level: 3 // 지도의 확대 레벨
+								    };  
+								
+								// 지도를 생성합니다    
+								var map = new kakao.maps.Map(mapContainer, mapOption); 
+								
+								// 주소-좌표 변환 객체를 생성합니다
+								var geocoder = new kakao.maps.services.Geocoder();
+								
+								// 주소로 좌표를 검색합니다
+								geocoder.addressSearch('${vo.addr1}', function(result, status) {															// 주소를 매개변수로 설정
+								
+								    // 정상적으로 검색이 완료됐으면 
+								     if (status === kakao.maps.services.Status.OK) {
+								
+								        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+								
+								        // 결과값으로 받은 위치를 마커로 표시합니다
+								        var marker = new kakao.maps.Marker({
+								            map: map,
+								            position: coords
+								        });
+								
+								        // 인포윈도우로 장소에 대한 설명을 표시합니다
+								        var infowindow = new kakao.maps.InfoWindow({
+								            content: '<div style="width:150px;text-align:center;padding:6px 0;">${vo.title}</div>'							// 마커이름을 타이틀로 설정
+								        });
+								        infowindow.open(map, marker);
+								
+								        // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+								        map.setCenter(coords);
+								    } 
+								});    
+								</script>
       					</td>
       				</tr>
       			</table>
