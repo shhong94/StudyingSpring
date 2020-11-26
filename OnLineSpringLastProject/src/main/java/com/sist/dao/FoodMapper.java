@@ -23,8 +23,23 @@ public interface FoodMapper {
 	public FoodVO FoodDetailData(int no);
 	
 	
-	// 음식종류(food_detail7 type컬럼)를 finddata에 넣고 이와 관련된 레시피 정보 가져오기
+	// 음식종류(food_detail7 type컬럼)를 finddata에 넣고 이와 관련된 레시피 정보 가져오기 =====================================
 	@Select("SELECT title, poster, chef, rownum FROM recipe WHERE rownum < 5 AND REGEXP_LIKE(title, #{finddata})")
 	public List<RecipeVO> foodLikeRecipeData(String finddata);
+	
+	
+	// 몽고디비 게시판 상세페이지 우측에서 지도 클릭시 해당 지역의 음식점 출력 ===========================================================
+	@Select("SELECT no, poster, title, rownum FROM food_detail7 WHERE rownum <= 12 AND addr LIKE '%'||#{gu}||'%'")
+	public List<FoodVO> foodLocationFindData(String gu);
+	
+	
+	// 좋아요 탑5 음식점 가져오기 ======================================================================================================================
+	@Select("SELECT no, title, poster, rownum FROM (SELECT no, title, poster FROM food_detail7 ORDER BY good DESC) WHERE rownum <= 5")
+	public List<FoodVO> foodTop5();
+	
+	
+	// 좋아요 탑5 레시피 가져오기 ======================================================================================================================
+	@Select("SELECT no, title, poster, rownum FROM recipe WHERE rownum <= 5")
+	public List<RecipeVO> recipeTop5();
 	
 }

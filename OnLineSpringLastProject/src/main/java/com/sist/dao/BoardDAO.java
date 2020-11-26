@@ -25,6 +25,10 @@ public class BoardDAO {
 	
 	private DBCollection dbc;			// 테이블
 	
+	
+	@Autowired
+	private FoodDAO fdao;
+	
 	public BoardDAO(){
 		try {
 			mc = new MongoClient("localhost", 27017);
@@ -41,7 +45,7 @@ public class BoardDAO {
 		try {
 			int max = 0;
 			
-			// DBCursor : ResultSet
+			// DBCursor : ResultSet (여러 DBObject 묶음)
 			// dbc.find() : ps.rxrcuteQuery("SELECT * FROM ~~~~");
 			DBCursor cursor = dbc.find();
 			
@@ -102,8 +106,8 @@ public class BoardDAO {
 		
 	}
 	
-	// 상세보기
-	public BoardVO boardDetailData(int no){
+	// 상세보기 ============================================================================================================================
+	public BoardVO boardDetailData(int no, int type){					
 		BoardVO vo = new BoardVO();
 		try {
 			// 조건
@@ -112,10 +116,14 @@ public class BoardDAO {
 			
 			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);		// SELECT * FROM board WHERE no = #{no}	 ==  findOne({no : 1})
 			
+			if(type == 1){																						// 타입이 1이면 그냥 상세보기 (조회수 증가), 1이 아니면 조건문 건너띄고 수정 전 상세보기 등 (조회수 증가 안됨)
+				int hit = obj.getInt("hit");
+				BasicDBObject up = new BasicDBObject("$set", new BasicDBObject("hit", hit + 1));
+				dbc.update(where, up);
+			}
+			
 			// 조회수 증가
-			int hit = obj.getInt("hit");
-			BasicDBObject up = new BasicDBObject("$set", new BasicDBObject("hit", hit + 1));
-			dbc.update(where, up);
+			
 			
 			obj = (BasicDBObject)dbc.findOne(where);
 			vo.setNo(obj.getInt("no"));
@@ -131,9 +139,74 @@ public class BoardDAO {
 		return vo;
 	}
 	
-	// 수정하기
+	// 수정하기 ===============================================================================================================================
+	public boolean boardUpdate(BoardVO vo){
+		boolean bCheck = false;
+		try {
+			// 몽고디비에 저장된 비밀번호 읽기
+			
+			// 조건문
+			BasicDBObject where = new BasicDBObject();
+			where.put("no", vo.getNo());
+			
+			// 조건에 해당하는 {} 가져오기
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);				// DBCursor : {}묶음       BasicDBObject : {} 한개
+			if(vo.getPwd().equals(obj.getString("pwd"))){
+				bCheck = true;
+				BasicDBObject updateObj = new BasicDBObject();					// 수정내용을 임시로 저장할 BasicDBObject
+				updateObj.put("name", vo.getName());
+				updateObj.put("subject", vo.getSubject());
+				updateObj.put("content", vo.getContent());
+				BasicDBObject update = new BasicDBObject("$set", updateObj);	// 
+				
+				dbc.update(where, update);										// where에 해당하는 오브젝트를 update 오브젝트처럼 바꿔라
+			}
+			else{
+				bCheck = false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return bCheck;
+	}
 	
-	// 삭제하기
+	// 삭제하기 ===============================================================================================================================
+	public boolean board_delete(int no, String pwd){
+		boolean bCheck = false;
+		try {
+			// 조건
+			BasicDBObject where = new BasicDBObject();
+			where.put("no", no);
+			
+			// 비밀번호 가져오기
+			BasicDBObject obj = (BasicDBObject)dbc.findOne(where);
+			
+			if(pwd.equals(obj.getString("pwd"))){
+				bCheck = true;
+				dbc.remove(where);						// where에 해당하는 오브젝트를 삭제
+			}
+			else{
+				bCheck = false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return bCheck;
+	}
+	
+	
+	
+	// 총 페이지 ===============================================================================================================================
+	public int boardTotalPage(){
+		int total = 0;
+		try {
+			DBCursor cursor = dbc.find();
+			total = cursor.count();					// SELECT COUNT(*) FROM ~~~~
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return (int)Math.ceil(total / 10.0);
+	}
 	
 	// 찾기 ☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★ 어려움
 }

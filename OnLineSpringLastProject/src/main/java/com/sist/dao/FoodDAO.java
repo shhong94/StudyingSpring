@@ -1,6 +1,7 @@
 package com.sist.dao;
 
 
+import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.util.*;
@@ -36,6 +37,25 @@ public class FoodDAO {
 	// 
 	public List<RecipeVO> foodLikeRecipeData(String finddata){
 		return mapper.foodLikeRecipeData(finddata);
+	}
+	
+	
+	// 몽고디비 게시판 상세페이지 우측에서 지도 클릭시 해당 지역의 음식점 출력 ===========================================================
+	public List<FoodVO> foodLocationFindData(String gu){
+		return mapper.foodLocationFindData(gu);
+	}
+	
+	
+	
+	// 좋아요 탑5 음식점 가져오기 ======================================================================================================================
+	public List<FoodVO> foodTop5(){
+		return mapper.foodTop5();
+	}
+	
+	
+	// 좋아요 탑5 레시피 가져오기 ======================================================================================================================
+	public List<RecipeVO> recipeTop5(){
+		return mapper.recipeTop5();
 	}
 	
 }
