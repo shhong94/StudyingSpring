@@ -11,8 +11,8 @@ public class MainController {
 		return "main";
 	}
 	
-	@RequestMapping("recipe/list.do")
+	/*@RequestMapping("recipe/list.do")
 	public String recipe_list(){
 		return "recipe/list";
-	}
+	}*/
 }

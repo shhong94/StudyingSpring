@@ -1,13 +1,37 @@
 package com.sist.dao;
 
+import java.io.Serializable;
+/*
+ *   Object������ ���� => ����ȭ(implements Serializable)
+ *      => ObjectOutputStream 
+ *   ����� �� => ������ȭ 
+ *      => ObjectInputStream 
+ *      
+ *   class A
+ *   {
+ *     int a=10;
+ *   }
+ *   
+ *   A a=new A();
+ *   
+ *   A b=new A();
+ */
 public class RecipeVO {
 	private int no;
-	private String title;
-	private String poster;
-	private String chef;
-	private String link;
-	
-	
+    private String title;
+    private String poster;
+    private String chef;
+    private String link;
+    private String hit;
+    
+    
+    
+	public String getHit() {
+		return hit;
+	}
+	public void setHit(String hit) {
+		this.hit = hit;
+	}
 	public int getNo() {
 		return no;
 	}
@@ -38,6 +62,13 @@ public class RecipeVO {
 	public void setLink(String link) {
 		this.link = link;
 	}
-	
-	
+    
 }
+
+
+
+
+
+
+
+
