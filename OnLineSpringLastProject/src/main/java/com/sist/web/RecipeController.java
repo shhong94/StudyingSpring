@@ -67,5 +67,32 @@ public class RecipeController {
 	
 	
 	
+	// 셰프 레시피 ============================================================================================================================
+	@RequestMapping("recipe/chef_product.do")
+	public String recipe_chef_product(String chef, Model model, String page, String fd){
+		
+		if(page == null){
+			page = "1";
+		}
+		
+		int curpage = Integer.parseInt(page);
+		
+		List<RecipeVO> list = new ArrayList<RecipeVO>();
+		if(fd == null){														// 검색하지 않으면
+			list = dao.chefProductData(chef, curpage);
+		}
+		else{																// 검색을 하면
+			list = dao.chefProductFindData(chef, fd);
+		}
+		
+		
+		model.addAttribute("chef", chef);
+		model.addAttribute("list", list);
+		
+		return "recipe/chef_product";
+	}
+	
+	
+	
 	
 }
