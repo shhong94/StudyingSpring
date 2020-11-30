@@ -1,4 +1,4 @@
-package com.sist.dao;
+package com.sist.recipe;
 
 import java.io.Serializable;
 /*

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sist.dao.FoodDAO;
 import com.sist.naver.NaverManager;
@@ -113,7 +114,7 @@ public class FoodController {
 	
 	// 댓글 작성 =========================================================================================================
 	@RequestMapping("reply_insert.do")
-	public String reply_insert(int cno, String msg, HttpSession session){
+	public String reply_insert(int cno, String msg, HttpSession session, RedirectAttributes attr){
 		
 //		String id = (String)session.getAttribute("id");
 //		String name = (String)session.getAttribute("name");
@@ -124,8 +125,9 @@ public class FoodController {
 		vo.setName("테스트이름");
 		rdao.replyInsert(vo);
 		
-		
-		return "redirect:../food/food_detail.do?no=" + cno;
+		attr.addAttribute(cno);										// URL의 파라미터를 보낼 때 RecirectAttributes 사용
+//		return "redirect:../food/food_detail.do?no=" + cno;
+		return "redirect:../food/food_detail.do";
 	}
 	
 	

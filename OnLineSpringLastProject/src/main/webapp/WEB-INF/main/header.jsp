@@ -28,6 +28,9 @@
                 <a class="nav-link" href="../recipe/list.do">레시피</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="../recipe/chef_list.do">셰프</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="../food/list.do">맛집</a>
               </li>
               <li class="nav-item">
@@ -38,6 +41,9 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="../news/list.do">뉴스</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="../chat/chat.do">챗봇</a>
               </li>
             </ul>
           </div>
