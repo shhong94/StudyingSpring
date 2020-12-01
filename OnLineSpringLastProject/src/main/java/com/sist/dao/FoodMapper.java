@@ -42,4 +42,13 @@ public interface FoodMapper {
 	@Select("SELECT no, title, poster, rownum FROM recipe WHERE rownum <= 5")
 	public List<RecipeVO> recipeTop5();
 	
+	
+	// 추천 레시피 출력 ===============================================================================================================================
+	@Select("SELECT DISTINCT title FROM food_detail7")
+	public List<String> recipeTitleData();
+	
+	
+	// 추천 레시피의 상세보기 ==========================================================================================================================
+	@Select("SELECT no, title, poster FROM food_detail7 WHERE title = #{title}")
+	public List<FoodVO> recommandFindData(String title);
 }

@@ -58,4 +58,17 @@ public class FoodDAO {
 		return mapper.recipeTop5();
 	}
 	
+	
+	// 추천 레시피 출력 ===============================================================================================================================
+	public List<String> recipeTitleData(){
+		return mapper.recipeTitleData();
+	}
+	
+	
+	
+	// 추천 레시피의 상세보기 ==========================================================================================================================
+	public List<FoodVO> recommandFindData(String title){
+		return mapper.recommandFindData(title);
+	}
+	
 }

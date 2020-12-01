@@ -1,8 +1,15 @@
 package com.sist.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.sist.dao.FoodDAO;
+import com.sist.dao.FoodVO;
+import com.sist.recommand.NaverBlogFind;
+import com.sist.recommand.RecommandManager;
+import com.sist.recommand.RecommandVO;
 
 import java.util.*;
 
@@ -21,6 +28,19 @@ import java.util.*;
 @Controller
 @RequestMapping("recommand/")
 public class RecommandController {
+	
+	@Autowired
+	private RecommandManager mgr;
+	
+	@Autowired
+	private NaverBlogFind nb;
+	
+	@Autowired
+	private FoodDAO dao;
+	
+	
+	
+	
 	
 	@RequestMapping("list.do")
 	public String recommand_list(){
@@ -66,6 +86,23 @@ public class RecommandController {
 		
 		model.addAttribute("ss", ss);								// ss배열 넘기기
 		return "recomm_list";
+	}
+	
+	
+	// 추천 레시피를 출력 ========================================================================================================
+	@RequestMapping("find.do")
+	public String recommand_find(String fd, Model model){
+		nb.naverFindData(fd);  										// XML 제작
+		List<RecommandVO> list = mgr.recommandData();
+		List<FoodVO> fList = new ArrayList<FoodVO>();
+		for(RecommandVO vo : list){
+			List<FoodVO> dList = dao.recommandFindData(vo.getTitle());
+			fList.add(dList.get(0));
+		}
+		
+		model.addAttribute("fList", fList);
+		
+		return "recomm_find";
 	}
 	
 	
