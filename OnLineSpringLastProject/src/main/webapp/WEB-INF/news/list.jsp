@@ -11,6 +11,8 @@
 	<div class="latest-products">
 		<div style="height: 130px;"></div>
 		<div class="container">
+		
+		
 			<div class="row">	
 				<h3 class="text-center">뉴스 검색</h3>
 				<table class="table">
@@ -43,6 +45,8 @@
 					</tr>
 				</table>
 			</div>
+			
+			
 		</div>
 	</div>
 </body>
