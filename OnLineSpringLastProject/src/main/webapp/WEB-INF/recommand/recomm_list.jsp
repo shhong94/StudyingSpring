@@ -8,7 +8,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
 $(function(){
-	#('.recomm').click(function(){
+	$('.recomm').click(function(){
 		let no = $(this).attr('text');
 		$.ajax({
 			type: 'post',
@@ -17,9 +17,9 @@ $(function(){
 			success: function(result){
 				$('#print').html(result)
 			}
-		})
+		});
 	})
-})
+});
 </script>
 <title>Insert title here</title>
 </head>

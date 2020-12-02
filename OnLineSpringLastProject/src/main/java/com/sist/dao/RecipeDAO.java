@@ -92,4 +92,15 @@ public class RecipeDAO {
 		
 		return list;
 	}
+	
+	
+	
+	// 셰프 리스트의 총 페이지 구하기 ==================================================================================================================
+	public int chefTotalPage(){
+		BasicQuery query = new BasicQuery("{}");							// SELECT WHERE절 : 전부 가져오기
+		List<ChefVO> list = mt.find(query, ChefVO.class, "chef7");			// 조건에 맞는 셰프 리스트 가져오기
+		int count = list.size();											// 리스트 개수
+		int total = (int)(Math.ceil(count / 20.0));
+		return total;
+	}
 }
