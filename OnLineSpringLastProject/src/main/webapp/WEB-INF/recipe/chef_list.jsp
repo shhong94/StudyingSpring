@@ -30,7 +30,7 @@
 				</c:forEach>
 			</div> --%>
 		</div>
-		<script src="../recipe/chef.js"></script>
+		<script src="../recipe/bundle.js"></script>
 	</div>
 </body>
 </html>
