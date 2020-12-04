@@ -12,7 +12,7 @@ public class Manager {
 		
 		MongoDB mongodb = new MongoDB();
 		
-		mongodb.InsertTour();
+		mongodb.InsertIntoMongoDB();
 		
 	}
 }

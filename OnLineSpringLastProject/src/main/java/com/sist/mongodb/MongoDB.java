@@ -17,7 +17,7 @@ public class MongoDB {
 		try {
 			mc = new MongoClient("localhost", 27017);
 			db = mc.getDB("mydb");
-			dbc = db.getCollection("tour");
+			dbc = db.getCollection("park");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

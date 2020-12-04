@@ -122,4 +122,53 @@ public class ReactController {
 		}
 		return json;
 	}
+	
+	
+	
+	
+	// 리액트 hooks ==============================================================================================================================================================
+	
+	// 레시피 목록 출력 =====================================================================================================================
+	@RequestMapping(value="react_recipe/recipe_list.do", produces="text/plain;charset=UTF-8")		// 스프링에서 리액트로 전송시 한글 깨짐 방지
+	public String recipe_list(String page){														// JSON으로 넘기기 때문에 Model이 필요 없음
+		if(page == null){
+			page = "1";
+		}
+		
+		int curpage = Integer.parseInt(page);
+		List<RecipeVO> list = dao.recipeListData(curpage);
+		
+		String json = "";
+		try {
+			JSONArray arr = new JSONArray();						// [ {}, {}, {}... ]
+			for(RecipeVO vo : list){
+				JSONObject obj = new JSONObject();					// {}
+				obj.put("poster", vo.getPoster());
+				obj.put("title", vo.getTitle());
+				obj.put("chef", vo.getChef());
+				arr.add(obj);
+			}
+			
+			json = arr.toJSONString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
+	
+	// 리액트로 셰프 리스트의 총 페이지 전송 ===========================================================================================================================================
+	@RequestMapping("recipe/totalpage.do")
+	public String recipe_total(){
+		
+		int total = 0;
+		try {
+			int count = dao.recipeCount();
+			total = (int)(Math.ceil(count / 12.0));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return String.valueOf(total);
+	}
 }
